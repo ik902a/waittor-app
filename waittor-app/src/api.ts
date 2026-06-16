@@ -25,7 +25,6 @@ export const api: AxiosInstance = axios.create({
 
 // Переменные для предотвращения множественного рефреша
 let isRefreshing = false;
-// let failedQueue: any[] = [];
 let failedQueue: QueuePromise[] = [];
 
 const processQueue = (error: any, token: string | null = null) => {

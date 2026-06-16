@@ -1,11 +1,12 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { authService } from './authService';
-import axios from 'axios';
+import { authService } from "./authService";
+import axios from "axios";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   login: (token: string) => void;
   logout: () => void;
+  loading: boolean; // Добавляем loading в контекст (пригодится)
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -28,25 +29,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let isMounted = true; // Флаг для предотвращения Race Condition
-    
-    const handleAuthExpired = () => setIsAuthenticated(false);
-    window.addEventListener('auth-expired', handleAuthExpired);
+
+    const handleAuthExpired = () => {
+      if (isMounted) setIsAuthenticated(false);
+    };
+    window.addEventListener("auth-expired", handleAuthExpired);
 
     const checkAuth = async () => {
       try {
         const response = await axios.post<{ accessToken: string }>(
-          'http://localhost:9091',
+          '/api/auth/refresh',
           {},
-          { withCredentials: true }
+          // { withCredentials: true },
+          { _retry: true } as any // Флаг, чтобы интерцептор не зациклился
         );
-        
+
         // Обновляем состояние, только если компонент еще жив
         if (isMounted) {
           authService.setToken(response.data.accessToken);
           setIsAuthenticated(true);
         }
-      } catch (e) {
-        console.log('Сессия отсутствует или просрочена');
+      } catch (error) {
+        // Безопасное логирование для TypeScript
+        const message =
+          error instanceof Error ? error.message : "Неизвестная ошибка";
+        console.log("Сессия отсутствует или просрочена:", message);
+
         if (isMounted) {
           authService.clearToken();
           setIsAuthenticated(false);
@@ -62,15 +70,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => {
       isMounted = false; // Отменяем обновление состояния при размонтировании
-      window.removeEventListener('auth-expired', handleAuthExpired);
+      window.removeEventListener("auth-expired", handleAuthExpired);
     };
   }, []);
 
   if (loading) return <div>Загрузка...</div>;
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
-      {children}
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, loading }}>
+      {/* {children} */}
+            {/* Пока идет проверка, показываем один общий лоадер, чтобы роуты не делали редирект раньше времени */}
+      {loading ? (
+        <div className="global-loader">Загрузка приложения...</div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };

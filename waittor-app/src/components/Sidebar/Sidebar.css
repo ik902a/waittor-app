@@ -1,0 +1,21 @@
+.sidebar {
+  position: fixed;
+  top: 100px;
+  left: 0;
+  width: 160px; /* Фиксированная ширина сайдбара */
+  height: calc(100vh - 100px); /* Высота экрана минус высота шапки */
+  background-color: #ffffff;
+  border-right: 1px solid #374151;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 24px 16px;
+  z-index: 100; /* Чтобы сайдбар был поверх основного контента */
+}
+
+/* Контейнер для кнопок навигации */
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Расстояние между кнопками */
+}

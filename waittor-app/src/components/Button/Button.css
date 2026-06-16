@@ -16,3 +16,45 @@
     background: #3e6ae1;
     color: #fff;
 }
+
+.btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.btn:hover { background: var(--primary-hover); }
+
+.btn-edit, .btn-del {
+    background: transparent;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    height: 32px;
+    transition: all 0.2s;
+}
+
+.btn-edit { color: var(--text-muted); }
+.btn-edit:hover { color: var(--primary); background: #dbeafe; }
+
+.btn-del { color: var(--text-muted); }
+.btn-del:hover { color: var(--danger); background: var(--danger-bg); }
+
+/* не нужно? */
+.sidebar-btn {
+  width: 100%;
+  justify-content: flex-start !important; /* Текст кнопок будет слева */
+  padding: 12px 16px !important;
+  /* background-color: transparent !important; */
+  /* color: #9ca3af !important; */
+  border: none !important;
+}

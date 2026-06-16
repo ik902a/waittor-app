@@ -1,17 +1,18 @@
 import React from "react";
 import "./Button.css";
 
-interface ButtonProps {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>{
   children: React.ReactNode; // Обязательный проп
-  click: () => void;
+  // pro: () => void;
 }
 
-function Button({ children, click }: ButtonProps): React.JSX.Element {
+export function Button({ children, className = '', ...props }: ButtonProps): React.JSX.Element {
   return (
-    <button className="button" onClick={click}>
+    <button
+    // className={`btn btn-${variant} ${className}`}
+    className={`button ${className}`}
+     {...props}>
       {children}
     </button>
   );
 }
-
-export default Button;

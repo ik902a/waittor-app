@@ -4,7 +4,6 @@ let accessToken: string | null = null;
 
 export const authService = {
   setToken(token: string): void {
-    console.log("setToken=", token)
     accessToken = token;
   },
 

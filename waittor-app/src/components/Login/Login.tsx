@@ -1,9 +1,12 @@
 import React, { useState, type SubmitEvent } from "react";
 import { useAuth } from "../../AuthContext";
 import { api } from "../../api";
+import { useNavigate } from "react-router-dom"; // 1. Импортируем хук навигации
+import "./Login.css"
 
 export const Login: React.FC = () => {
   const { login } = useAuth();
+  const navigate = useNavigate(); // 2. Инициализируем хук навигации
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +30,9 @@ export const Login: React.FC = () => {
       // Бэкенд запишет Refresh Token в куки автоматически (благодаря withCredentials)
       // А Access Token мы передаем в метод login
       login(response.data.accessToken);
+            // 3. ПЕРЕНАПРАВЛЯЕМ на рабочую страницу
+      // replace: true заменяет /login в истории браузера, чтобы кнопка "Назад" не возвращала на форму входа
+      navigate("/dashboard", { replace: true }); 
     } catch (error) {
       setError("Неверный логин или пароль");
     } finally {

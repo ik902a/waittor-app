@@ -1,0 +1,25 @@
+/* Общий контейнер на весь экран */
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+/* Нижняя часть (Сайдбар + Контент) */
+.layout-body {
+  display: flex;
+  flex-grow: 1;
+  /* Отодвигаем вниз на высоту Header (70px) */
+  padding-top: 70px; 
+}
+
+/* Область основного контента справа от сайдбара */
+.layout-content {
+  flex-grow: 1;
+  padding: 32px;
+  box-sizing: border-box;
+  /* Отодвигаем контент вправо на ширину сайдбара */
+  margin-left: 130px; 
+    border: 2px solid blue !important; /* Контент будет в синей рамке */
+}
