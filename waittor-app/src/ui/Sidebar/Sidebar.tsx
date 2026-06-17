@@ -1,8 +1,8 @@
 import React, { useState, type ChangeEvent } from 'react';
-import { Button } from '../Button/Button';
+import { Button } from '../../components/Button/Button';
 import './Sidebar.css';
 import { api } from '../../api';
-import { getMovie } from '../../dal/requests';
+import { getMovie } from '../../dal/torApi';
 
 // Описание интерфейса для типа торрента (Enum аналог на фронтенде)
 // interface TorrentTypeOption {

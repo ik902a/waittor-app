@@ -32,7 +32,7 @@ export const Login: React.FC = () => {
       login(response.data.accessToken);
             // 3. ПЕРЕНАПРАВЛЯЕМ на рабочую страницу
       // replace: true заменяет /login в истории браузера, чтобы кнопка "Назад" не возвращала на форму входа
-      navigate("/dashboard", { replace: true }); 
+      navigate("/movies", { replace: true }); 
     } catch (error) {
       setError("Неверный логин или пароль");
     } finally {

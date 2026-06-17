@@ -1,7 +1,10 @@
 import React, { useEffect, useState, type ChangeEvent } from "react";
 import { api } from "../../api";
-import { getMovie } from "../../dal/requests";
-import "./List.css"
+import { getMovie } from "../../dal/torApi";
+import { useTors } from "../../bll/useTors";
+import { TorItem } from "../TorItem/TorItem";
+import { TorItemHeader } from "../TorItemHeader/TorItemHeader";
+import styles from "./List.module.css";
 
 // Описание интерфейса для типа торрента (Enum аналог на фронтенде)
 interface TorrentTypeOption {
@@ -28,7 +31,7 @@ interface TorFormData {
 const TORRENT_TYPES: TorrentTypeOption[] = [
   { value: "OUR", name: "Отечественный" },
   { value: "SERIAL", name: "Сериал" },
-  { value: "FOREIGN", name: "Зарубежный"}
+  { value: "FOREIGN", name: "Зарубежный" },
 ];
 
 // Функция для получения корректной локальной даты в формате YYYY-MM-DD
@@ -49,6 +52,7 @@ export function List(): React.JSX.Element {
     torrentType: TORRENT_TYPES[0]?.value || "",
   });
 
+  // const tors = useTors();
   // Загрузка списка фильмов при старте
   useEffect(() => {
     fetchTors();
@@ -64,28 +68,6 @@ export function List(): React.JSX.Element {
     } catch (error) {
       console.error("Ошибка загрузки данных:", error);
     }
-  };
-
-  // Удаление фильма
-  const handleDelete = async (id: string | number): Promise<void> => {
-    if (!window.confirm("Вы уверены?")) return;
-    try {
-      await api.delete(`/api/tors/delete/${id}`);
-      setTors(tors.filter((tor) => tor.id !== id));
-    } catch (error) {
-      console.error("Ошибка удаления:", error);
-    }
-  };
-
-  // Открытие формы для редактирования
-  const handleEditClick = (tor: Tor): void => {
-    setFormData({
-      id: tor.id,
-      name: tor.name,
-      release: tor.release ? tor.release.split("T")[0] : "", // Формат YYYY-MM-DD для input type="date"
-      torrentType: tor.torrentType,
-    });
-    setIsFormOpen(true);
   };
 
   // // Общий обработчик изменений в полях формы
@@ -112,104 +94,93 @@ export function List(): React.JSX.Element {
   //   }
   // };
 
-  // Форматирование даты
-  const formatDate = (dateString: string): string => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("ru-RU");
-  };
-  //
   return (
-    // <div>
-      <div className="tor-list">
-        {/* Заголовки */}
-        <div className="tor-row header">
-          <div>Название</div>
-          <div>Дата Релиза</div>
-          <div>Тип фильма</div>
-          <div></div>
-          <div></div>
-        </div>
+    <div className={styles['tor-list']}>
+      <TorItemHeader />
 
-        {/* Строки с данными */}
-        {tors.map((tor) => (
-          <div className="tor-row" key={tor.id}>
-            <div style={{ fontWeight: 500 }}>{tor.name}</div>
-            <div style={{ color: "#64748b" }}>{formatDate(tor.release)}</div>
-            <div>
-              <span
-                style={{
-                  background: "#dbeafe",
-                  color: "#1e40af",
-                  padding: "2px 8px",
-                  borderRadius: "12px",
-                  fontSize: "0.85em",
-                }}
-              >
-                {TORRENT_TYPES.find((t) => t.value === tor.torrentType)?.name ||
-                  tor.torrentType}
-              </span>
-            </div>
-            <button className="btn-edit" onClick={() => handleEditClick(tor)}>
-              ✎
-            </button>
-            <button className="btn-del" onClick={() => handleDelete(tor.id)}>
-              ×
-            </button>
-          </div>
-        ))}
-      </div>
+      {tors?.map((tor) => {
+        // Удаление фильма
+        const handleDeleteClick = async (torId: number): Promise<void> => {
+          if (!window.confirm("Вы уверены?")) return;
+          try {
+            await api.delete(`/api/tors/delete/${torId}`);
+            setTors(tors.filter((tor) => tor.id !== torId));
+          } catch (error) {
+            console.error("Ошибка удаления:", error);
+          }
+        };
 
-      //{/* Контейнер формы
-      // {isFormOpen && (
-      //   <div style={{ marginTop: "20px" }} className="form-card">
-      //     <form onSubmit={handleSubmit}>
-      //       <input type="hidden" value={formData.id} />
+        // Открытие формы для редактирования
+        const handleEditClick = (tor: Tor): void => {
+          setFormData({
+            id: tor.id,
+            name: tor.name,
+            release: tor.release ? tor.release.split("T")[0] : "", // Формат YYYY-MM-DD для input type="date"
+            torrentType: tor.torrentType,
+          });
+          setIsFormOpen(true);
+        };
 
-      //       <input
-      //         type="text"
-      //         name="name"
-      //         placeholder="Название"
-      //         required
-      //         value={formData.name}
-      //         onChange={handleInputChange}
-            // />
-
-            // <input
-            //   type="date"
-            //   name="release"
-            //   value={formData.release}
-            //   onChange={handleInputChange}
-            // />
-
-            // <select
-            //   name="torrentType"
-            //   value={formData.torrentType}
-            //   onChange={handleInputChange}
-            // >
-            //   {TORRENT_TYPES.map((type) => (
-    //             <option key={type.value} value={type.value}>
-    //               {type.name}
-    //             </option>
-    //           ))}
-    //         </select>
-
-    //         <div style={{ display: "flex", gap: "8px", marginTop: "10px" }}>
-    //           <button type="submit" className="btn">
-    //             Сохранить
-    //           </button>
-    //           <button
-    //             type="button"
-    //             className="btn"
-    //             style={{ background: "#94a3b8" }}
-    //             onClick={() => setIsFormOpen(false)}
-    //           >
-    //             Отмена
-    //           </button>
-    //         </div>
-    //       </form>
-    //     </div>
-    //   )} 
-    //  </div> 
+        return (
+          <TorItem
+            tor={tor}
+            onTorEdit={handleEditClick}
+            onTorDelete={handleDeleteClick}
+            key={tor.id}
+          />
+        );
+      })}
+    </div>
   );
+
+  //{/* Контейнер формы
+  // {isFormOpen && (
+  //   <div style={{ marginTop: "20px" }} className="form-card">
+  //     <form onSubmit={handleSubmit}>
+  //       <input type="hidden" value={formData.id} />
+  //       <input
+  //         type="text"
+  //         name="name"
+  //         placeholder="Название"
+  //         required
+  //         value={formData.name}
+  //         onChange={handleInputChange}
+  // />
+
+  // <input
+  //   type="date"
+  //   name="release"
+  //   value={formData.release}
+  //   onChange={handleInputChange}
+  // />
+
+  // <select
+  //   name="torrentType"
+  //   value={formData.torrentType}
+  //   onChange={handleInputChange}
+  // >
+  //   {TORRENT_TYPES.map((type) => (
+  //             <option key={type.value} value={type.value}>
+  //               {type.name}
+  //             </option>
+  //           ))}
+  //         </select>
+
+  //         <div style={{ display: "flex", gap: "8px", marginTop: "10px" }}>
+  //           <button type="submit" className="btn">
+  //             Сохранить
+  //           </button>
+  //           <button
+  //             type="button"
+  //             className="btn"
+  //             style={{ background: "#94a3b8" }}
+  //             onClick={() => setIsFormOpen(false)}
+  //           >
+  //             Отмена
+  //           </button>
+  //         </div>
+  //       </form>
+  //     </div>
+  //   )}
+  //  </div>
 }

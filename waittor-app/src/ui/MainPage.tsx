@@ -1,10 +1,10 @@
 import React from "react";
-import { Header } from "./components/Header/Header";
-import "./Dashboard.css";
-import { Sidebar } from "./components/Sidebar/Sidebar";
-import { List } from "./components/List/List";
+import { Header } from "./Header/Header";
+import { Sidebar } from "./Sidebar/Sidebar";
+import { List } from "../components/List/List";
+import "./MainPage.css";
 
-export function Dashboard(): React.JSX.Element {
+export function MainPage(): React.JSX.Element {
   return (
     <div className="layout-container">
       <Header />

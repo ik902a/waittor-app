@@ -2,7 +2,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import logo from "/favicon.svg";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../Button/Button";
+import { Button } from "../../components/Button/Button";
 import "./Header.css";
 
 export function Header(): React.JSX.Element {

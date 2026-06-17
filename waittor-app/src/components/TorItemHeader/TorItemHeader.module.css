@@ -1,0 +1,18 @@
+.header {
+  font-weight: 600;
+  color: var(--primary);
+  border: none;
+  background: transparent;
+}
+
+.torRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 40px 40px;
+  gap: 12px;
+  background: var(--card-bg);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  align-items: center;
+  transition: all 0.2s ease;
+}

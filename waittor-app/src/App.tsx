@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./AuthContext";
-import { Dashboard } from "./Dashboard";
-import { Login } from "./components/Login/Login";
+import { MainPage } from "./ui/MainPage";
+import { Login } from "./ui/Login/Login";
 
 // Обертка для защищенных маршрутов
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
@@ -24,16 +24,16 @@ export default function App() {
 
           {/* Защищенные маршруты */}
           <Route
-            path="/dashboard"
+            path="/movies"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <MainPage />
               </ProtectedRoute>
             }
           />
 
           {/* Редирект по умолчанию */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/movies" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
