@@ -1,0 +1,12 @@
+.link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.caption {
+  margin-top: 16px;
+  font-size: 14px;
+  text-align: center;
+  color: #4b5563;
+}

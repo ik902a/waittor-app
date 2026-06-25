@@ -5,13 +5,15 @@ import axios from "axios";
 interface AuthContextType {
   isAuthenticated: boolean;
   login: (token: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>; // Изменено с void на Promise<void>
   loading: boolean; // Добавляем loading в контекст (пригодится)
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   // Изначально ставим false, так как реальный статус мы узнаем только после checkAuth
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -21,10 +23,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuthenticated(true);
   };
 
-  const logout = (): void => {
-    authService.clearToken();
-    setIsAuthenticated(false);
-    // TODO: Вызвать API для удаления Refresh Token из кук
+  const logout = async (): Promise<void> => {
+    try {
+      // 1. Отправляем запрос на бэкенд для удаления Refresh Token из кук
+      await axios.post(
+        "/api/auth/logout",
+        {},
+        { withCredentials: true }, // Важно для удаления HttpOnly Cookies
+      );
+    } catch (error) {
+      console.error("Ошибка при выходе на сервере:", error);
+    } finally {
+      authService.clearToken();
+      setIsAuthenticated(false);
+
+    }console.log("LOGOUT")
   };
 
   useEffect(() => {
@@ -38,10 +51,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const checkAuth = async () => {
       try {
         const response = await axios.post<{ accessToken: string }>(
-          '/api/auth/refresh',
+          "/api/auth/refresh",
           {},
           // { withCredentials: true },
-          { _retry: true } as any // Флаг, чтобы интерцептор не зациклился
+          { _retry: true } as any, // Флаг, чтобы интерцептор не зациклился
         );
 
         // Обновляем состояние, только если компонент еще жив
@@ -79,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout, loading }}>
       {/* {children} */}
-            {/* Пока идет проверка, показываем один общий лоадер, чтобы роуты не делали редирект раньше времени */}
+      {/* Пока идет проверка, показываем один общий лоадер, чтобы роуты не делали редирект раньше времени */}
       {loading ? (
         <div className="global-loader">Загрузка приложения...</div>
       ) : (

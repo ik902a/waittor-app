@@ -1,4 +1,4 @@
-import { api } from "../api";
+import { api } from "../auth/authApi";
 
 // Описание интерфейса сущности Tor (Movie)
 interface Tor {

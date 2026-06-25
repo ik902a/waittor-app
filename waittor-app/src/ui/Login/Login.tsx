@@ -1,10 +1,14 @@
-import React, { useState, type SubmitEvent } from "react";
-import { useAuth } from "../../AuthContext";
-import { api } from "../../api";
+import { useState, type SubmitEvent } from "react";
+import { useAuth } from "../../auth/AuthContext";
+import { api } from "../../auth/authApi";
 import { useNavigate } from "react-router-dom"; // 1. Импортируем хук навигации
-import "./Login.css"
+import styles from "./Login.module.css";
+import { Button } from "../../components/Button/Button";
+import { Input } from "../../components/Input/Input";
+import { LogCuption } from "../../components/LogCuption/LogCuption";
+import { ErrorMessage } from "../../components/ErrorMessage/ErrorMessage";
 
-export const Login: React.FC = () => {
+export function Login() {
   const { login } = useAuth();
   const navigate = useNavigate(); // 2. Инициализируем хук навигации
   const [username, setUsername] = useState("");
@@ -30,9 +34,9 @@ export const Login: React.FC = () => {
       // Бэкенд запишет Refresh Token в куки автоматически (благодаря withCredentials)
       // А Access Token мы передаем в метод login
       login(response.data.accessToken);
-            // 3. ПЕРЕНАПРАВЛЯЕМ на рабочую страницу
+      // 3. ПЕРЕНАПРАВЛЯЕМ на рабочую страницу
       // replace: true заменяет /login в истории браузера, чтобы кнопка "Назад" не возвращала на форму входа
-      navigate("/movies", { replace: true }); 
+      navigate("/movies", { replace: true });
     } catch (error) {
       setError("Неверный логин или пароль");
     } finally {
@@ -41,24 +45,30 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="Логин"
-        disabled={loading}
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Пароль"
-        disabled={loading}
-      />
-      <button type="submit" disabled={loading}>
-        {loading ? 'Вход...' : 'Войти'}
-      </button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-    </form>
+    <>
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <Input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Логин"
+          disabled={loading}
+        />
+        <Input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Пароль"
+          disabled={loading}
+        />
+        <Button type="submit" disabled={loading}>
+          {loading ? "Вход..." : "Войти"}
+        </Button>
+
+        <LogCuption question="Впервые у нас?" value="Зарегистрироваться" path="/registry"/>
+
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+      </form>
+    </>
   );
-};
+}

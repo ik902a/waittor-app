@@ -1,8 +1,9 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "./AuthContext";
+import { AuthProvider, useAuth } from "./auth/AuthContext";
 import { MainPage } from "./ui/MainPage";
 import { Login } from "./ui/Login/Login";
+import { Registry } from "./ui/Registry/Registry";
 
 // Обертка для защищенных маршрутов
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
@@ -21,6 +22,7 @@ export default function App() {
         <Routes>
           {/* Публичный маршрут */}
           <Route path="/login" element={<Login />} />
+          <Route path="/registry" element={<Registry />} />
 
           {/* Защищенные маршруты */}
           <Route

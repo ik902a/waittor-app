@@ -58,11 +58,6 @@ interface RefreshResponse {
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError): Promise<any> => {
-    console.log(
-      "Response error:",
-      error.response?.status,
-      error.response?.data,
-    );
     const originalRequest = error.config as
       | CustomInternalAxiosRequestConfig
       | undefined;
@@ -71,35 +66,31 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // Обрабатываем только 401 ошибку и только если этот запрос ЕЩЕ НЕ отправлялся повторно
     if (error.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);
     }
+
     // Если мы УЖЕ обновляем токен прямо сейчас, ставим этот запрос в очередь
     if (isRefreshing) {
       return new Promise<string>((resolve, reject) => {
         failedQueue.push({ resolve, reject });
-      })
-        .then((token) => {
-          if (originalRequest.headers) {
-            originalRequest.headers.set("Authorization", `Bearer ${token}`);
-          }
-          return api(originalRequest); // ИСПРАВЛЕНО: используем .request()
-        })
-        .catch((err) => Promise.reject(err));
+      }).then((token) => {
+        if (originalRequest.headers) {
+          originalRequest.headers.set("Authorization", `Bearer ${token}`);
+        }
+        return api(originalRequest);
+      });
     }
 
     originalRequest._retry = true;
     isRefreshing = true;
-  console.log('OLD token in request:', originalRequest.headers['Authorization']);
 
     try {
       const response = await axios.post<RefreshResponse>(
         "http://localhost:9091/api/auth/refresh",
         {},
         {
-          headers: {
-            Authorization: `Bearer ${authService.getToken()}`,
-          },
           withCredentials: true,
         },
       );
@@ -107,32 +98,19 @@ api.interceptors.response.use(
       const newAccessToken = response.data.accessToken;
       authService.setToken(newAccessToken);
 
-      console.log('NEW token:', newAccessToken);
-        console.log('OLD header before update:', originalRequest.headers['Authorization']);
-
-      // Пропускаем все накопившиеся запросы из очереди с новым токеном
-      processQueue(null, newAccessToken);
-
       if (originalRequest.headers) {
         originalRequest.headers.set(
           "Authorization",
           `Bearer ${newAccessToken}`,
         );
       }
+      // Пропускаем все накопившиеся запросы из очереди с новым токеном
+      processQueue(null, newAccessToken);
 
-        console.log('NEW header after update:', originalRequest.headers['Authorization']);
       return api(originalRequest);
     } catch (refreshError) {
-      // Проверяем, что ошибка именно 401 (просрочен refresh), а не сетевая
-      const isAuthError =
-        refreshError instanceof AxiosError &&
-        refreshError.response?.status === 401;
-
-      if (isAuthError) {
-        // Только при 401 очищаем токен и разлогиниваем
-        authService.clearToken();
-        window.dispatchEvent(new Event("auth-expired"));
-      }
+      authService.clearToken();
+      window.dispatchEvent(new Event("auth-expired"));
 
       // Ошибка обновления: чистим очередь, куки и триггерим разлогин в React
       processQueue(refreshError, null);

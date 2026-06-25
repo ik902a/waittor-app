@@ -1,5 +1,5 @@
 import React, { useEffect, useState, type ChangeEvent } from "react";
-import { api } from "../../api";
+import { api } from "../../auth/authApi";
 import { getMovie } from "../../dal/torApi";
 import { useTors } from "../../bll/useTors";
 import { TorItem } from "../TorItem/TorItem";

@@ -1,0 +1,27 @@
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 200;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box; 
+  height: 100px;
+  padding: 0 24px;
+  background-color: #dbeafe;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.logoGroup {
+  margin-left: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 12px;
+}

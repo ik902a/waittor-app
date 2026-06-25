@@ -1,7 +1,7 @@
 import React, { useState, type ChangeEvent } from 'react';
 import { Button } from '../../components/Button/Button';
 import './Sidebar.css';
-import { api } from '../../api';
+import { api } from '../../auth/authApi';
 import { getMovie } from '../../dal/torApi';
 
 // Описание интерфейса для типа торрента (Enum аналог на фронтенде)
