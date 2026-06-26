@@ -14,7 +14,7 @@
 }
 
 /* Контейнер для кнопок навигации */
-.sidebar-menu {
+.sidebarMenu {
   display: flex;
   flex-direction: column;
   gap: 8px; /* Расстояние между кнопками */

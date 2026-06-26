@@ -1,7 +1,7 @@
 .input {
   width: 100%;
   padding: 10px 14px;
-  margin-bottom: 16px; /* Отступ под каждым инпутом */
+  margin-bottom: 16px; 
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 16px;
@@ -19,4 +19,12 @@
   background-color: #f3f4f6;
   color: #9ca3af;
   cursor: not-allowed;
+}
+
+.inputError {
+  border-color: #ff4d4f !important;
+}
+
+.inputError:focus {
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
 }

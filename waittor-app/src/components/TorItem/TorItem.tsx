@@ -58,8 +58,8 @@ export function TorItem(props: TorItemProps) {
               tor.torrentType}
           </span>
         </div>
-        <Button className="btn-edit" onClick={handleEditClick}>✎</Button>
-        <Button className="btn-del" onClick={handleDeleteClick}>×</Button>
+        <Button className="buttonEdit" onClick={handleEditClick}>✎</Button>
+        <Button className="buttonDelete" onClick={handleDeleteClick}>×</Button>
       </div>
     </>
   );
