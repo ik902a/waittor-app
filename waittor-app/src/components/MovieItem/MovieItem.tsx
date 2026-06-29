@@ -1,8 +1,8 @@
 import { Button } from "../Button/Button";
-import styles from "./TorItem.module.css"
+import styles from "./MovieItem.module.css"
 
 // Описание интерфейса сущности Tor (Movie)
-interface Tor {
+interface Movie {
   id: number;
   name: string;
   release: string; // Формат даты YYYY-MM-DD
@@ -21,23 +21,23 @@ const TORRENT_TYPES: TorrentTypeOption[] = [
   { value: "FOREIGN", name: "Зарубежный" },
 ];
 
-type TorItemProps = {
-  tor: Tor;
-  onTorEdit: (tor: Tor) => void;
-  onTorDelete: (torId: number) => void;
+type MovieItemProps = {
+  movie: Movie;
+  onEditClick: (movie: Movie) => void;
+  onDeleteClick: (movieId: number) => void;
 };
 
-export function TorItem(props: TorItemProps) {
-  const tor = props.tor;
+export function MovieItem(props: MovieItemProps) {
+  const movie = props.movie;
 
   // Удаление фильма
   const handleDeleteClick = () => {
-    props.onTorDelete(tor.id);
+    props.onDeleteClick(movie.id);
   };
 
   // Открытие формы для редактирования
   const handleEditClick = () => {
-    props.onTorEdit(tor);
+    props.onEditClick(movie);
   };
 
   // Форматирование даты
@@ -48,19 +48,17 @@ export function TorItem(props: TorItemProps) {
   };
 
   return (
-    <>
-      <div className={styles['tor-row']}>
-        <div className={styles.torName}>{tor.name}</div>
-        <div className={styles.torDate}>{formatDate(tor.release)}</div>
+      <div className={styles.movieRow}>
+        <div className={styles.movieName}>{movie.name}</div>
+        <div className={styles.movieDate}>{formatDate(movie.release)}</div>
         <div>
-          <span className={styles.torType}>
-            {TORRENT_TYPES.find((t) => t.value === tor.torrentType)?.name ||
-              tor.torrentType}
+          <span className={styles.movieType}>
+            {TORRENT_TYPES.find((t) => t.value === movie.torrentType)?.name ||
+              movie.torrentType}
           </span>
         </div>
         <Button className="buttonEdit" onClick={handleEditClick}>✎</Button>
         <Button className="buttonDelete" onClick={handleDeleteClick}>×</Button>
       </div>
-    </>
   );
 }

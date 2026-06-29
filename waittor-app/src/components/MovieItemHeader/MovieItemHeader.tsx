@@ -1,8 +1,8 @@
-import styles from './TorItemHeader.module.css'
+import styles from './MovieItemHeader.module.css'
 
-export function TorItemHeader() {
+export function MovieItemHeader() {
   return (
-    <div className={`${styles.torRow} ${styles.header}`}>
+    <div className={styles.header}>
       <div>Название</div>
       <div>Дата Релиза</div>
       <div>Тип фильма</div>

@@ -1,61 +1,50 @@
 import React from "react";
 import { api } from "../../auth/authApi";
-import { TorItem } from "../TorItem/TorItem";
-import { TorItemHeader } from "../TorItemHeader/TorItemHeader";
+import { MovieItem } from "../MovieItem/MovieItem";
+import { MovieItemHeader } from "../MovieItemHeader/MovieItemHeader";
 import styles from "./List.module.css";
 
 // Внутри List.tsx изменить объявление пропсов:
 interface ListProps {
-  tors: Tor[];
-  setTors: React.Dispatch<React.SetStateAction<Tor[]>>;
+  movies: Movie[];
+  setMovies: React.Dispatch<React.SetStateAction<Movie[]>>;
+  onEditClick: (movie: Movie) => void;
+  onDeleteClick?: (id: number) => void;
 }
 
-// Описание интерфейса сущности Tor (Movie)
-interface Tor {
+interface Movie {
   id: number;
   name: string;
   release: string; // Формат даты YYYY-MM-DD
   torrentType: string;
 }
 
-export function List({ tors, setTors }: ListProps): React.JSX.Element {
+export function List({ movies, setMovies, onEditClick }: ListProps): React.JSX.Element {
+  const handleDeleteClick = async (movieId: number): Promise<void> => {
+    if (!window.confirm("Вы уверены, что хотите удалить этот фильм?")) return;
+    try {
+      // Используем ваш эндпоинт из примера
+      await api.delete(`/api/movies/delete/${movieId}`);
+      setMovies((prevMovies) =>
+        prevMovies.filter((movie) => movie.id !== movieId),
+      );
+    } catch (error) {
+      console.error("Ошибка удаления:", error);
+    }
+  };
 
   return (
-    <div className={styles['tor-list']}>
-      <TorItemHeader />
+    <div className={styles.movieList}>
+      <MovieItemHeader />
 
-      {tors?.map((tor) => {
-        // Удаление фильма
-        const handleDeleteClick = async (torId: number): Promise<void> => {
-          if (!window.confirm("Вы уверены?")) return;
-          try {
-            await api.delete(`/api/tors/delete/${torId}`);
-            setTors(tors.filter((tor) => tor.id !== torId));
-          } catch (error) {
-            console.error("Ошибка удаления:", error);
-          }
-        };
-
-        // // Открытие формы для редактирования
-        // const handleEditClick = (tor: Tor): void => {
-        //   setFormData({
-        //     id: tor.id,
-        //     name: tor.name,
-        //     release: tor.release ? tor.release.split("T")[0] : "", // Формат YYYY-MM-DD для input type="date"
-        //     torrentType: tor.torrentType,
-        //   });
-        //   setIsFormOpen(true);
-        // };
-
-        return (
-          <TorItem
-            tor={tor}
-            onTorEdit={() => console.log("Update")}
-            onTorDelete={handleDeleteClick}
-            key={tor.id}
-          />
-        );
-      })}
+      {movies?.map((movie) => (
+        <MovieItem
+          key={movie.id}
+          movie={movie}
+          onEditClick={() => onEditClick(movie)}
+          onDeleteClick={handleDeleteClick}
+        />
+      ))}
     </div>
   );
 }

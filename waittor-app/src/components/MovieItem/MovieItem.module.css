@@ -1,4 +1,4 @@
-.tor-row {
+.movieRow {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 40px 40px;
   gap: 12px;
@@ -10,20 +10,20 @@
   transition: all 0.2s ease;
 }
 
-.tor-row:not(.header):hover {
+.movieRow:not(.header):hover {
   border-color: var(--primary);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.torName {
+.movieName {
   font-weight: 500;
 }
 
-.torDate {
+.movieDate {
   color: #64748b;
 }
 
-.torType {
+.movieType {
   background: #dbeafe;
   color: #1e40af;
   padding: 2px 8px;

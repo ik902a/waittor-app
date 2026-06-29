@@ -20,9 +20,6 @@ export function Button({
     ${styles[className] || ""}
   `.trim();
 
-  console.log(className)
-  console.log(buttonClass)
-
   return (
     <button
       className={buttonClass}

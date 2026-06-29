@@ -3,9 +3,6 @@
   color: var(--primary);
   border: none;
   background: transparent;
-}
-
-.torRow {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 40px 40px;
   gap: 12px;

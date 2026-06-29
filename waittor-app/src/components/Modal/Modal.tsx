@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../Button/Button";
 import { Input } from "../Input/Input";
 import styles from "./Modal.module.css";
@@ -10,24 +10,23 @@ interface ModalProps {
   onClose: () => void;
   children?: React.ReactNode;
   fetchTors: () => Promise<void>;
+  editData: Movie | null;
 }
 
 interface FieldErrors {
   name?: string;
-  release?: string; //date
-  torrentType?: string; // enum
+  release?: string;
+  torrentType?: string;
   global?: string;
 }
 
-// Описание интерфейса сущности Tor (Movie)
-interface Tor {
-  id: number;
+interface Movie {
+  id?: number;
   name: string;
   release: string; // Формат даты YYYY-MM-DD
   torrentType: string;
 }
 
-// Описание интерфейса для типа торрента (Enum аналог на фронтенде)
 interface TorrentTypeOption {
   value: string;
   name: string;
@@ -42,34 +41,47 @@ const TORRENT_TYPES: TorrentTypeOption[] = [
 
 const getTodayDateString = (): string => {
   const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return today.toISOString().split("T")[0];
+};
+
+const initialFormState: Movie = {
+  name: "",
+  release: getTodayDateString(),
+  torrentType: "",
 };
 
 export function Modal({
   isOpen,
   onClose,
   fetchTors,
+  editData,
 }: ModalProps): React.JSX.Element | null {
-  const [tor, setTor] = useState({
-    name: "",
-    release: getTodayDateString(),
-    torrentType: "",
-  });
+  const [movie, setMovie] = useState<Movie>(initialFormState);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [loading, setLoading] = useState(false);
 
-  // Если состояние isOpen === false, компонент ничего не рендерит
+  // Синхронизируем стейт с входящими данными при открытии модалки
+  useEffect(() => {
+    if (isOpen) {
+      if (editData) {
+        setMovie(editData);
+      } else {
+        setMovie(initialFormState);
+      }
+      setErrors({});
+    }
+  }, [isOpen, editData]);
+
   if (!isOpen) return null;
+
+  const isEditMode = !!movie.id;
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    setTor((prevTor) => ({
-      ...prevTor, // Копируем все текущие поля объекта
+    setMovie((prevMovie) => ({
+      ...prevMovie, // Копируем все текущие поля объекта
       [name]: value, // Обновляем только то поле, у которого совпадает name
     }));
 
@@ -84,19 +96,16 @@ export function Modal({
     setLoading(true);
     setErrors({});
     try {
-      console.log("POST /api/tors", tor);
-      // Отправляем POST-запрос с объектом данных tor
-      // Типизируем ответ как <Tor>, где Tor — ваш интерфейс сущности с бэкенда
-      await api.post<Tor>("/api/tors", tor);
+      if (isEditMode) {
+        console.log(`PUT /api/tors/${movie.id}`, movie);
+        await api.put<Movie>(`/api/movies/${movie.id}`, movie);
+      } else {
+        console.log("POST /api/tors", movie);
+        await api.post<Movie>("/api/movies", movie);
+      }
 
       await fetchTors();
-
-      onClose();
-      setTor({
-        name: "",
-        release: getTodayDateString(),
-        torrentType: "",
-      });
+      handleClose();
     } catch (error) {
       setErrors((prev) => ({
         ...prev,
@@ -107,23 +116,29 @@ export function Modal({
     }
   };
 
+  const handleClose = () => {
+    setMovie(initialFormState);
+    onClose();
+  };
+
   return (
     // Backdrop — это полупрозрачный темный фон за модалкой. Клик по нему закрывает окно.
-    <div className={styles.backdrop} onClick={onClose}>
+    <div className={styles.backdrop} onClick={handleClose}>
       {/* Остановка всплытия (stopPropagation), чтобы клик внутри самой модалки её не закрывал */}
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-        <h3 style={{ marginTop: 0, marginBottom: "16px" }}>
-          Добавление фильма
+        <h3 className={styles.headline}>
+          {isEditMode ? "Редактирование фильма" : "Добавление фильма"}
         </h3>
 
+        {errors.global && <ErrorMessage>{errors.global}</ErrorMessage>}
+
         <form onSubmit={handleSubmit}>
-          {/* <input type="hidden" value={formData.id} /> */}
 
           <div className={styles.inputWrapper}>
             <Input
               type="text"
               name="name"
-              value={tor.name}
+              value={movie.name}
               onChange={handleChange}
               placeholder="Название фильма"
               disabled={loading}
@@ -137,7 +152,7 @@ export function Modal({
             <Input
               type="date"
               name="release"
-              value={tor.release}
+              value={movie.release}
               onChange={handleChange}
               placeholder="Дата релиза"
               disabled={loading}
@@ -150,7 +165,7 @@ export function Modal({
           <div className={styles.inputWrapper}>
             <select
               name="torrentType"
-              value={tor.torrentType}
+              value={movie.torrentType}
               onChange={handleChange}
               disabled={loading}
               required
@@ -161,19 +176,13 @@ export function Modal({
                 </option>
               ))}
             </select>
+            {errors.torrentType && <ErrorMessage>{errors.torrentType}</ErrorMessage>}
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              gap: "8px",
-              justifyContent: "flex-end",
-              marginTop: "24px",
-            }}
-          >
-            <Button onClick={onClose}>Отмена</Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Сохранение..." : "Сохранить"}
+          <div className={styles.buttonGroup}>
+            <Button type="button" onClick={handleClose}>Отмена</Button>
+            <Button type="submit" disabled={loading} isLoading={loading}>
+              Сохранить
             </Button>
           </div>
         </form>
