@@ -20,8 +20,8 @@ export function MainPage(): React.JSX.Element {
 
   const fetchMovies = async (): Promise<void> => {
     try {
-      console.log("GET /api/movies");
-      const response = await api.get<Movie[]>("/api/movies");
+      console.log("GET /movies");
+      const response = await api.get<Movie[]>("/movies");
       setMovies(response.data);
     } catch (error) {
       console.error("Ошибка загрузки данных:", error);
@@ -53,7 +53,7 @@ export function MainPage(): React.JSX.Element {
 
     try {
       console.log(`DELETE /api/tors/${id}`);
-      await api.delete(`/api/movies/${id}`);
+      await api.delete(`/movies/${id}`);
       await fetchMovies(); // Обновляем список после удаления
     } catch (error) {
       console.error("Ошибка при удалении фильма:", error);

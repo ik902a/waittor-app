@@ -15,7 +15,7 @@ export function Sidebar({ onAddClick }: SidebarProps): React.JSX.Element {
     // Запускаем таймер на 5 секунд для разблокировки
     const unlockTimer = new Promise((resolve) => setTimeout(resolve, 5000));
     try {
-      await api.get("/api/movies/check");
+      await api.get("/movies/check");
       console.log("Запрос на проверку успешно отправлен");
     } catch (error) {
       console.error("Ошибка:", error);

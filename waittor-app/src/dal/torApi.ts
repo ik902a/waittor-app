@@ -10,7 +10,7 @@ interface Tor {
 
 export const getMovie = () => {
         try {
-          return api.get<Tor[]>("/api/tors")
+          return api.get<Tor[]>("/movies")
           .then(res => res.data);
         } catch (error) {
           console.error("Ошибка загрузки данных:", error);

@@ -24,7 +24,7 @@ export function List({ movies, setMovies, onEditClick }: ListProps): React.JSX.E
     if (!window.confirm("Вы уверены, что хотите удалить этот фильм?")) return;
     try {
       // Используем ваш эндпоинт из примера
-      await api.delete(`/api/movies/delete/${movieId}`);
+      await api.delete(`/movies/${movieId}`);
       setMovies((prevMovies) =>
         prevMovies.filter((movie) => movie.id !== movieId),
       );

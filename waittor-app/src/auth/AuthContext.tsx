@@ -27,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       // 1. Отправляем запрос на бэкенд для удаления Refresh Token из кук
       await axios.post(
-        "/api/auth/logout",
+        "/auth/logout",
         {},
         { withCredentials: true }, // Важно для удаления HttpOnly Cookies
       );
@@ -51,7 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const checkAuth = async () => {
       try {
         const response = await axios.post<{ accessToken: string }>(
-          "/api/auth/refresh",
+          "api/auth/refresh",
           {},
           // { withCredentials: true },
           { _retry: true } as any, // Флаг, чтобы интерцептор не зациклился

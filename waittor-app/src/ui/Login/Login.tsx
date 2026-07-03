@@ -24,7 +24,7 @@ export function Login() {
     try {
       // Отправляем запрос на бэкенд
       const response = await api.post<{ accessToken: string }>(
-        "/api/auth/login",
+        "/auth/login",
         {
           username,
           password,

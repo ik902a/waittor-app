@@ -21,7 +21,7 @@ export function useTors() {
     // getMovie()
     try {
       console.log("/api/tors");
-      const response = await api.get<Tor[]>("/api/movies");
+      const response = await api.get<Tor[]>("/movies");
       setTors(response.data);
     } catch (error) {
       console.error("Ошибка загрузки данных:", error);

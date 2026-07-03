@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  waittor-app:
+    build: .
+    container_name: waittor-app
+    ports:
+      - "3001:80" # Внешний порт для пользователей
+    networks:
+      - waittor_external_net
+
+networks:
+  waittor_external_net:
+    external: true
+    name: waittor_default
+    

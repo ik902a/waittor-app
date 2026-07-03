@@ -53,7 +53,8 @@ export function Registry() {
 
     try {
       // Отправляем запрос на ваш WebFlux бэкенд (например, на /api/auth/register)
-      await axios.post("http://localhost:9091/api/auth/register", user);
+      // await axios.post("http://localhost:9091/api/auth/register", user);
+      await axios.post("/auth/register", user);
 
       // После успешной регистрации отправляем пользователя на страницу логина
       navigate("/login");

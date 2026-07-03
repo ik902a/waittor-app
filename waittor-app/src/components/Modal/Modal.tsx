@@ -97,11 +97,11 @@ export function Modal({
     setErrors({});
     try {
       if (isEditMode) {
-        console.log(`PUT /api/tors/${movie.id}`, movie);
-        await api.put<Movie>(`/api/movies/${movie.id}`, movie);
+        console.log(`PUT /tors/${movie.id}`, movie);
+        await api.put<Movie>(`/movies/${movie.id}`, movie);
       } else {
         console.log("POST /api/tors", movie);
-        await api.post<Movie>("/api/movies", movie);
+        await api.post<Movie>("/movies", movie);
       }
 
       await fetchTors();

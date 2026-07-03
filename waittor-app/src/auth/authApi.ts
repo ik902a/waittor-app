@@ -16,7 +16,8 @@ interface CustomInternalAxiosRequestConfig extends InternalAxiosRequestConfig {
 }
 
 export const api: AxiosInstance = axios.create({
-  baseURL: "http://localhost:9091",
+  // baseURL: "http://localhost:9091",
+  baseURL: "/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -88,7 +89,8 @@ api.interceptors.response.use(
 
     try {
       const response = await axios.post<RefreshResponse>(
-        "http://localhost:9091/api/auth/refresh",
+        // "http://localhost:9091/api/auth/refresh",
+        "/api/auth/refresh",
         {},
         {
           withCredentials: true,
