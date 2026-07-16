@@ -1,0 +1,38 @@
+/* Контейнер для инпута и кнопки сброса */
+.searchGroup {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 400px; /* Ограничиваем максимальную ширину строки */
+  margin: 0 20px;   /* Отступы, чтобы поиск не прилипал по бокам */
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 36px 10px 16px; /* Правый паддинг больше, чтобы текст не залезал под крестик */
+  font-size: 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #1e293b;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.searchInput:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+.searchInput::placeholder {
+  color: #94a3b8;
+}
+
+/* Адаптивность для небольших экранов */
+@media (max-width: 600px) {
+  .searchGroup {
+    max-width: 100%;
+    margin: 0;
+    order: 3; /* Смещаем поиск вниз на мобилках */
+  }
+}

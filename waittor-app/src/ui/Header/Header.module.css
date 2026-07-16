@@ -25,3 +25,17 @@ header {
   display: flex;
   gap: 12px;
 }
+
+/* Адаптивность для небольших экранов */
+@media (max-width: 600px) {
+  header {
+    height: auto;
+    padding: 12px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .logoGroup {
+    margin-left: 0;
+  }
+}

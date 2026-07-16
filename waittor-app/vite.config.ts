@@ -22,9 +22,10 @@ export default defineConfig(({ mode }) => {
       proxy: {
         // Локально перенаправляем запросы на WebFlux
         "/api": {
-          target: env.VITE_PROXY_TARGET || 'http://localhost:9091',
+          target: env.VITE_API_BASE_URL || "http://localhost:9091",
           changeOrigin: true,
           secure: false,
+          rewrite: (path) => path.replace(/^\/api/, ""), // удалит /api перед отправкой на бэк
         },
       },
     },
@@ -42,12 +43,6 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
-    },
-    // Передаем URL бэкенда в приложение (для продакшена)
-    define: {
-      "process.env.VITE_API_BASE_URL": JSON.stringify(
-        env.VITE_API_BASE_URL || "",
-      ),
     },
   };
 });

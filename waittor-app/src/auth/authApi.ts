@@ -8,16 +8,22 @@ import { authService } from "./authService";
 
 interface QueuePromise {
   resolve: (token: string) => void;
-  reject: (error: any) => void;
+  reject: (error: AxiosError) => void;
 }
 
 interface CustomInternalAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
+interface RefreshResponse {
+  accessToken: string;
+}
+
+// ВАЖНО: всегда /api. В деве проксирует Vite, в проде — Nginx. http://localhost:9091
+const BASE_URL = "/api";
+
 export const api: AxiosInstance = axios.create({
-  // baseURL: "http://localhost:9091",
-  baseURL: "/api",
+  baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -28,12 +34,12 @@ export const api: AxiosInstance = axios.create({
 let isRefreshing = false;
 let failedQueue: QueuePromise[] = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: AxiosError | null, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
-    } else {
-      prom.resolve(token!);
+    } else if (token) {
+      prom.resolve(token);
     }
   });
   failedQueue = [];
@@ -51,10 +57,6 @@ api.interceptors.request.use(
   (error: AxiosError): Promise<never> => Promise.reject(error),
 );
 
-interface RefreshResponse {
-  accessToken: string;
-}
-
 // 2. Интерцептор ОТВЕТА
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
@@ -63,12 +65,11 @@ api.interceptors.response.use(
       | CustomInternalAxiosRequestConfig
       | undefined;
 
-    if (!originalRequest) {
-      return Promise.reject(error);
-    }
-
-    // Обрабатываем только 401 ошибку и только если этот запрос ЕЩЕ НЕ отправлялся повторно
-    if (error.response?.status !== 401 || originalRequest._retry) {
+    if (
+      !originalRequest ||
+      error.response?.status !== 401 ||
+      originalRequest._retry
+    ) {
       return Promise.reject(error);
     }
 
@@ -89,12 +90,9 @@ api.interceptors.response.use(
 
     try {
       const response = await axios.post<RefreshResponse>(
-        // "http://localhost:9091/api/auth/refresh",
-        "/api/auth/refresh",
+        `${BASE_URL}/auth/refresh`,
         {},
-        {
-          withCredentials: true,
-        },
+        { withCredentials: true },
       );
 
       const newAccessToken = response.data.accessToken;
@@ -108,16 +106,17 @@ api.interceptors.response.use(
       }
       // Пропускаем все накопившиеся запросы из очереди с новым токеном
       processQueue(null, newAccessToken);
-
       return api(originalRequest);
     } catch (refreshError) {
+      const axiosError = refreshError as AxiosError;
+
       authService.clearToken();
       window.dispatchEvent(new Event("auth-expired"));
 
       // Ошибка обновления: чистим очередь, куки и триггерим разлогин в React
-      processQueue(refreshError, null);
+      processQueue(axiosError, null);
 
-      return Promise.reject(refreshError);
+      return Promise.reject(axiosError);
     } finally {
       isRefreshing = false;
     }

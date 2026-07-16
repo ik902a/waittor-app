@@ -4,15 +4,22 @@ import { Button } from "../../components/Button/Button";
 import styles from "./Header.module.css";
 import { useAuth } from "../../auth/AuthContext";
 import { Clock } from "../../components/Clock/Clock";
+import { Search } from "../../components/Search/Search";
 
-export function Header() {
+// 1. Описываем типы для пропсов поиска
+interface HeaderProps {
+  searchValue?: string;
+  onSearch?: (text: string) => void;
+}
+
+export function Header({ searchValue = "", onSearch }: HeaderProps) {
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();
 
   // Функция-обработчик для кнопки Выход
   const handleLogout = async () => {
-    await logout();         // Вызываем очистку сессии на сервере и клиенте
-    navigate("/login");     // Перенаправляем на страницу логина
+    await logout(); // Вызываем очистку сессии на сервере и клиенте
+    navigate("/login"); // Перенаправляем на страницу логина
   };
 
   return (
@@ -21,6 +28,11 @@ export function Header() {
         <img src={logo} alt="Logo" />
         <Clock />
       </div>
+      {/* 2. Добавляем инпут поиска (отображается только для авторизованных пользователей) */}
+      {/* Рендерим компонент Search, если пользователь авторизован */}
+      {isAuthenticated && onSearch && (
+        <Search searchValue={searchValue} onSearch={onSearch} />
+      )}
 
       {isAuthenticated ? (
         <div className={styles.buttonGroup}>
