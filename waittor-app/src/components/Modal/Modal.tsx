@@ -9,7 +9,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children?: React.ReactNode;
-  fetchTors: () => Promise<void>;
+  fetchMovies: () => Promise<void>;
   editData: Movie | null;
 }
 
@@ -53,7 +53,7 @@ const initialFormState: Movie = {
 export function Modal({
   isOpen,
   onClose,
-  fetchTors,
+  fetchMovies,
   editData,
 }: ModalProps): React.JSX.Element | null {
   const [movie, setMovie] = useState<Movie>(initialFormState);
@@ -104,7 +104,7 @@ export function Modal({
         await api.post<Movie>("/movies", movie);
       }
 
-      await fetchTors();
+      await fetchMovies();
       handleClose();
     } catch (error) {
       setErrors((prev) => ({
